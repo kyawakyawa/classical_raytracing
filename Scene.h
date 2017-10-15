@@ -31,7 +31,8 @@ struct Scene{
 
             if(intersection != nullptr && min_t > intersection->distance){
                 intersection_info->rewrite(shape,intersection);
-            }
+            }else
+				delete intersection;
         }
 
         return intersection_info;
