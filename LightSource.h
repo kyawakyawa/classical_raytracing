@@ -8,5 +8,5 @@ struct LightSource{
 
 	virtual Lighting* lighting_at(Vec3& pos) const = 0;
 
-	virtual ~LightSource() = 0;
+	virtual ~LightSource() = default;
 };

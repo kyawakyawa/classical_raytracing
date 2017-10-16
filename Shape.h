@@ -13,5 +13,5 @@ struct Shape{
 
 	virtual Intersection_point* get_intersection(const Ray &ray) const = 0;
 
-	virtual ~Shape() = 0;
+	virtual ~Shape() = default;
 };
