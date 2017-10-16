@@ -35,6 +35,9 @@ struct Scene{
 				delete intersection;
         }
 
+		if(intersection_info->shape == nullptr)
+			return nullptr;
+
         return intersection_info;
     }
 
