@@ -27,6 +27,13 @@ struct FColor{
         printf("%d %d %d\n",r,g,b);
     }
 
+    FColor fix(){
+        R r = std::max(0.0,red);r = std::min(1.0,red);
+        R g = std::max(0.0,green);g = std::min(1.0,green);
+        R b = std::max(0.0,blue);b = std::min(1.0,blue);
+        return FColor(r,g,b);
+    }
+
     constexpr FColor operator + (const FColor &obj) const{// 2項+ ex a + b
         return FColor(this->red + obj.red,this->green + obj.green,this->blue + obj.blue);
     }
