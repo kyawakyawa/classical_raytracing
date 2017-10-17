@@ -13,6 +13,7 @@ struct Scene{
     const int WIDTH = 512;
     const R INF = 1000000000.0;
     const FColor back;
+    const R epsilon = 1.0 / 512;
     
     Scene() = delete;
     Scene(FColor ia): Ia(ia),back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)){};
@@ -25,7 +26,7 @@ struct Scene{
         light_sources.push_back(light_source);
     }
 
-    Intersection_info* get_intersection_of_nearest(Ray ray){
+    Intersection_info* get_intersection_of_nearest(const Ray &ray) const{
         R min_t = INF;
         Intersection_info *intersection_info = new Intersection_info();
 
@@ -44,8 +45,19 @@ struct Scene{
 
         return intersection_info;
     }
+    bool is_shadow(const Ray &ray,const R max_t) const {
+        for(Shape *shape : shapes){
+            Intersection_point *intersection = shape->get_intersection(ray);
+            if(intersection != nullptr && max_t > intersection->distance){
+                delete intersection;
+                return true;
+            }
+            delete intersection;
+        }
+        return false;
+    }
 
-    void draw(){
+    void draw() const{
         printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
 
         for(int i = 0;i < HEIGHT;i++){
@@ -63,8 +75,16 @@ struct Scene{
 
                 FColor Ls = intersection_shape->material.ka * Ia;
 
+                ///////////交点の色の計算/////////
                 for(LightSource* light_source : light_sources){
                     Lighting* ltg = light_source->lighting_at(intersection->position);
+
+                    Ray shadow_ray(intersection->position + epsilon * ltg->direction,ltg->direction);
+                    if(is_shadow(shadow_ray,ltg->distance - epsilon)){
+                        delete ltg;
+                        continue;
+                    }
+                    
                     FColor &Ii = ltg->intensity;
                     R nl = (intersection->normal * ltg->direction);
 
@@ -81,6 +101,7 @@ struct Scene{
                     Ls += intersection_shape->material.ks * Ii * std::pow(vr,intersection_shape->material.alpha);
                     delete ltg;
                 }
+                ///////////////////////////////
 
                 Ls.print255();
                 delete intersection;

@@ -12,6 +12,6 @@ struct PointLightSource : public LightSource{
 	Lighting* lighting_at(Vec3& pos) const{
 		/*R distance = (position - pos).abs();
 		Vec3 direction = (position - pos).normalized();*/
-		return new Lighting((position - pos).abs(),intensity,Vec3(position - pos).normalized());
+		return new Lighting((position - pos).abs(),intensity,Vec3(position - pos));
 	}
 };

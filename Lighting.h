@@ -8,5 +8,5 @@ struct Lighting{
 	FColor intensity;
 	Vec3 direction;
 	Lighting() = delete;
-	constexpr Lighting(R d,FColor i,Vec3 _d) : distance(d),intensity(i),direction(_d){};
+	Lighting(R d,FColor i,Vec3 _d) : distance(d),intensity(i),direction(_d.normalized()){};
 };
