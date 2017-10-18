@@ -88,17 +88,14 @@ struct Scene{
                     FColor &Ii = ltg->intensity;
                     R nl = (intersection->normal * ltg->direction);
 
-                    if(nl < 0.0)
-                        continue;
-
-                    Ls += intersection_shape->material.kd * Ii * nl;
+                    if(nl >= 0.0)
+                        Ls += intersection_shape->material.kd * Ii * nl;
 
                     const R vr = (-ray.direction) * (2 * nl * intersection->normal - ltg->direction);
 
-                    if(vr < 0.0)
-                        continue;
+                    if(vr >= 0.0)
+                        Ls += intersection_shape->material.ks * Ii * std::pow(vr,intersection_shape->material.alpha);
 
-                    Ls += intersection_shape->material.ks * Ii * std::pow(vr,intersection_shape->material.alpha);
                     delete ltg;
                 }
                 ///////////////////////////////

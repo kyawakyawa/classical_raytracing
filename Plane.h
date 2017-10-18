@@ -30,6 +30,8 @@ struct Plane: public Shape{
 		if(t < 0.0)
 			return nullptr;
 
-		return new Intersection_point(t,ray.start + t * d,normal);
+		const R nd = (ray.direction * normal < 0.0) ? 1.0 : -1.0; 
+
+		return new Intersection_point(t,ray.start + t * d,nd * normal);
 	}
 };
