@@ -102,7 +102,7 @@ struct Scene{
 			Vec3 p = intersection->position + epsilon * (-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction);
 			recursive_raytrace(L,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),depth + 1);
 		}
-
+		delete intersection_info;
 	}
 	void draw() const{
 		printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
@@ -154,7 +154,7 @@ struct Scene{
 
 
 				Ls.print255();
-				delete intersection;
+				delete intersection_info;
 			}
 		}
 
