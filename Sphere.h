@@ -32,4 +32,8 @@ struct Sphere : public Shape{
 
 		return new Intersection_point(t,ray.start + t * d,nd * (s + t * d).normalized());
 	}
+
+	Material get_material(Vec3 &position) const {
+		return material;
+	}
 };

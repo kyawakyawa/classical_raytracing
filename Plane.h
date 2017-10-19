@@ -34,4 +34,8 @@ struct Plane: public Shape{
 
 		return new Intersection_point(t,ray.start + t * d,nd * normal);
 	}
+
+	Material get_material(Vec3 &position) const {
+		return material;
+	}
 };

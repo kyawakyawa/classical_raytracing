@@ -69,8 +69,9 @@ struct Scene{
 
 		Intersection_point *intersection = intersection_info->intersection_point;
 		Shape *intersection_shape = intersection_info->shape;
+		Material material = intersection_shape->get_material(intersection->position);
 
-		L += intersection_shape->material.ka * Ia;
+		L += material.ka * Ia;
 
 		///////////交点の色の計算/////////
 		for(LightSource* light_source : light_sources){
@@ -86,18 +87,18 @@ struct Scene{
 			R nl = (intersection->normal * ltg->direction);
 
 			if(nl >= 0.0)
-				L += intersection_shape->material.kd * Ii * nl;
+				L += material.kd * Ii * nl;
 
 			const R vr = (-ray.direction) * (2 * nl * intersection->normal - ltg->direction);
 
 			if(vr >= 0.0)
-				L += intersection_shape->material.ks * Ii * std::pow(vr,intersection_shape->material.alpha);
+				L += material.ks * Ii * std::pow(vr,material.alpha);
 
 			delete ltg;
 		}
 		///////////////////////////////
 
-		if(intersection_shape->material.type == MT_PERFECT_REF){
+		if(material.type == MT_PERFECT_REF){
 			Vec3 p = intersection->position + epsilon * (-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction);
 			recursive_raytrace(L,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),depth + 1);
 		}
@@ -118,8 +119,9 @@ struct Scene{
 
 				Intersection_point *intersection = intersection_info->intersection_point;
 				Shape *intersection_shape = intersection_info->shape;
+				Material material = intersection_shape->get_material(intersection->position);
 
-				FColor Ls = intersection_shape->material.ka * Ia;
+				FColor Ls = material.ka * Ia;
 
 				///////////交点の色の計算/////////
 				for(LightSource* light_source : light_sources){
@@ -135,17 +137,17 @@ struct Scene{
 					R nl = (intersection->normal * ltg->direction);
 
 					if(nl >= 0.0)
-						Ls += intersection_shape->material.kd * Ii * nl;
+						Ls += material.kd * Ii * nl;
 
 					const R vr = (-ray.direction) * (2 * nl * intersection->normal - ltg->direction);
 
 					if(vr >= 0.0)
-						Ls += intersection_shape->material.ks * Ii * std::pow(vr,intersection_shape->material.alpha);
+						Ls += material.ks * Ii * std::pow(vr,material.alpha);
 
 					delete ltg;
 				}
 				///////////////////////////////
-				if(intersection_shape->material.type == MT_PERFECT_REF){
+				if(material.type == MT_PERFECT_REF){
 					Vec3 p = intersection->position + epsilon * (-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction);
 					recursive_raytrace(Ls,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),1);
 				}

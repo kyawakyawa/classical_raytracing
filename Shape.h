@@ -13,5 +13,7 @@ struct Shape{
 
 	virtual Intersection_point* get_intersection(const Ray &ray) const = 0;
 
+	virtual Material get_material(Vec3 &position) const = 0;
+
 	virtual ~Shape() = default;
 };
