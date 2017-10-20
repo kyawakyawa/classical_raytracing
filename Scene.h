@@ -14,7 +14,7 @@ struct Scene{
 	const R INF = 1000000000.0;
 	const FColor back;
 	const R epsilon = 1.0 / 512;
-	const int MAX_DEPTH = 100;
+	const int MAX_DEPTH = 5;
 
 	Scene() = delete;
 	Scene(FColor ia): Ia(ia),back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)){};
@@ -58,14 +58,15 @@ struct Scene{
 		return false;
 	}
 
-	void recursive_raytrace(FColor &L,const Ray &ray,const FColor &kf,const int depth) const{
+	FColor recursive_raytrace(const Ray &ray,const int depth) const{
+		FColor L(0,0,0);
 		if(depth > MAX_DEPTH)
-			return;
+			return L;
 		Intersection_info *intersection_info = get_intersection_of_nearest(ray);
 
 		if(intersection_info == nullptr){
 			L += back;
-			return;
+			return L;
 		}
 
 		Intersection_point *intersection = intersection_info->intersection_point;
@@ -73,7 +74,7 @@ struct Scene{
 		Material material = intersection_shape->get_material(intersection->position);
 		Vec3 normal = ((ray.direction * intersection->normal < 0.0) ? 1.0 : -1.0) * intersection->normal;
 
-		L += kf * material.ka * Ia;
+		L += material.ka * Ia;
 
 		///////////交点の色の計算/////////
 		for(LightSource* light_source : light_sources){
@@ -89,22 +90,44 @@ struct Scene{
 			R nl = (normal * ltg->direction);
 
 			if(nl >= 0.0)
-				L += kf * material.kd * Ii * nl;
+				L += material.kd * Ii * nl;
 
 			const R vr = (-ray.direction) * (2 * nl * normal - ltg->direction);
 
 			if(vr >= 0.0)
-				L += kf * material.ks * Ii * std::pow(vr,material.alpha);
+				L += material.ks * Ii * std::pow(vr,material.alpha);
 
 			delete ltg;
 		}
 		///////////////////////////////
 
 		if(material.type == MT_PERFECT_REF){
-			Vec3 p = intersection->position + epsilon * (-2.0 * (normal * ray.direction) * normal + ray.direction);
-			recursive_raytrace(L,Ray(p,-2.0 * (normal * ray.direction) * normal + ray.direction),material.kf,depth + 1);
+			const Vec3 r = -2.0 * (normal * ray.direction) * normal + ray.direction;
+			const Vec3 p = intersection->position + epsilon * r;
+			L += material.kf * recursive_raytrace(Ray(p,r),depth + 1);
+		}
+
+		if(material.type == MT_REFRACTION){
+			const R n = ((ray.direction * intersection->normal < 0.0) ? 1.0 / material.n : material.n);
+			const R nr = 1.0 / n;
+
+			const R cos1 = -(ray.direction * normal);
+			const R cos2 = n * std::sqrt(nr * nr - (1.0 - cos1 * cos1));
+			const R omega = nr * cos2 - cos1;
+
+			const R p1 = (nr  * cos1 - cos2) / (nr * cos1 + cos2);
+			const R p2 = -omega / (nr * cos2 + cos1);
+			const R cr = 0.5 * (p1 * p1 + p2 * p2);
+
+			const Vec3 fe = n * ray.direction - n * omega * normal;
+
+			const Vec3 r = -2.0 * (normal * ray.direction) * normal + ray.direction;
+			const Vec3 p = intersection->position + epsilon * r;
+			L += cr * material.kf * recursive_raytrace(Ray(p,r),depth + 1);
+			L += (1.0 - cr) * material.kf * recursive_raytrace(Ray(intersection->position + epsilon * fe,fe),depth + 1);
 		}
 		delete intersection_info;
+		return L;//+= FColor(0.3,0,0);
 	}
 
 	void draw() const{
@@ -113,9 +136,7 @@ struct Scene{
 		for(int i = 0;i < HEIGHT;i++){
 			for(int j = 0;j < WIDTH;j++){
 				Ray ray(Vec3(0,0,-5),Vec3(2.0 * j / (WIDTH - 1) - 1,-2.0 * i / (HEIGHT - 1) + 1,5));
-				FColor L(0,0,0);
-				recursive_raytrace(L,ray,FColor(1,1,1),0);
-				L.print255();
+				(recursive_raytrace(ray,0)).print255();
 			}
 		}
 
