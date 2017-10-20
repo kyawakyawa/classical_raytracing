@@ -58,12 +58,13 @@ struct Scene{
 		return false;
 	}
 
-	void recursive_raytrace(FColor &L,const Ray &ray,const int depth) const{
+	void recursive_raytrace(FColor &L,const Ray &ray,const FColor &kf,const int depth) const{
 		if(depth > MAX_DEPTH)
 			return;
 		Intersection_info *intersection_info = get_intersection_of_nearest(ray);
 
 		if(intersection_info == nullptr){
+			L += back;
 			return;
 		}
 
@@ -71,7 +72,7 @@ struct Scene{
 		Shape *intersection_shape = intersection_info->shape;
 		Material material = intersection_shape->get_material(intersection->position);
 
-		L += material.ka * Ia;
+		L += kf * material.ka * Ia;
 
 		///////////交点の色の計算/////////
 		for(LightSource* light_source : light_sources){
@@ -87,12 +88,12 @@ struct Scene{
 			R nl = (intersection->normal * ltg->direction);
 
 			if(nl >= 0.0)
-				L += material.kd * Ii * nl;
+				L += kf * material.kd * Ii * nl;
 
 			const R vr = (-ray.direction) * (2 * nl * intersection->normal - ltg->direction);
 
 			if(vr >= 0.0)
-				L += material.ks * Ii * std::pow(vr,material.alpha);
+				L += kf * material.ks * Ii * std::pow(vr,material.alpha);
 
 			delete ltg;
 		}
@@ -100,7 +101,7 @@ struct Scene{
 
 		if(material.type == MT_PERFECT_REF){
 			Vec3 p = intersection->position + epsilon * (-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction);
-			recursive_raytrace(L,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),depth + 1);
+			recursive_raytrace(L,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),material.kf,depth + 1);
 		}
 		delete intersection_info;
 	}
@@ -149,7 +150,7 @@ struct Scene{
 				///////////////////////////////
 				if(material.type == MT_PERFECT_REF){
 					Vec3 p = intersection->position + epsilon * (-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction);
-					recursive_raytrace(Ls,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),1);
+					recursive_raytrace(Ls,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),material.kf,1);
 				}
 
 
