@@ -106,58 +106,16 @@ struct Scene{
 		}
 		delete intersection_info;
 	}
+
 	void draw() const{
 		printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
 
 		for(int i = 0;i < HEIGHT;i++){
 			for(int j = 0;j < WIDTH;j++){
 				Ray ray(Vec3(0,0,-5),Vec3(2.0 * j / (WIDTH - 1) - 1,-2.0 * i / (HEIGHT - 1) + 1,5));
-				Intersection_info *intersection_info = get_intersection_of_nearest(ray);
-
-				if(intersection_info == nullptr){
-					back.print255();
-					continue;
-				}
-
-				Intersection_point *intersection = intersection_info->intersection_point;
-				Shape *intersection_shape = intersection_info->shape;
-				Material material = intersection_shape->get_material(intersection->position);
-				Vec3 normal = ((ray.direction * intersection->normal < 0.0) ? 1.0 : -1.0) * intersection->normal;
-
-				FColor Ls = material.ka * Ia;
-
-				///////////交点の色の計算/////////
-				for(LightSource* light_source : light_sources){
-					Lighting* ltg = light_source->lighting_at(intersection->position);
-
-					Ray shadow_ray(intersection->position + epsilon * ltg->direction,ltg->direction);
-					if(is_shadow(shadow_ray,ltg->distance - epsilon)){
-						delete ltg;
-						continue;
-					}
-
-					FColor &Ii = ltg->intensity;
-					R nl = (normal * ltg->direction);
-
-					if(nl >= 0.0)
-						Ls += material.kd * Ii * nl;
-
-					const R vr = (-ray.direction) * (2 * nl * normal - ltg->direction);
-
-					if(vr >= 0.0)
-						Ls += material.ks * Ii * std::pow(vr,material.alpha);
-
-					delete ltg;
-				}
-				///////////////////////////////
-				if(material.type == MT_PERFECT_REF){
-					Vec3 p = intersection->position + epsilon * (-2.0 * (normal * ray.direction) * normal + ray.direction);
-					recursive_raytrace(Ls,Ray(p,-2.0 * (normal * ray.direction) * normal + ray.direction),material.kf,1);
-				}
-
-
-				Ls.print255();
-				delete intersection_info;
+				FColor L(0,0,0);
+				recursive_raytrace(L,ray,FColor(1,1,1),0);
+				L.print255();
 			}
 		}
 
