@@ -2,12 +2,20 @@
 
 #include "Shape.h"
 
+enum Plane_type{
+	PL_DEFAULT,//通常
+	PL_CHECKERBOARD_CHECK//チェッカーボード・チェック xz平面に垂直な平面である必要あり
+};
+
 struct Plane: public Shape{
 	Vec3 normal;
 	Vec3 position;
+	Plane_type type;
+	const R edge = 0.25;//チェックの一辺の長さ
 
 	Plane() = delete;
-	Plane(Vec3 n,Vec3 p,Material m): Shape(m),normal(n.normalized()),position(p){};
+	Plane(Vec3 n,Vec3 p,Material m): Shape(m),normal(n.normalized()),position(p),type(PL_DEFAULT){};
+	Plane(Vec3 n,Vec3 p,Plane_type t): Shape(Material(MT_DEFAULT)),normal(n.normalized()),position(p),type(t){};
 	
 	Intersection_point* get_intersection(const Ray &ray) const{
 		const Vec3 &d = ray.direction;
@@ -36,6 +44,16 @@ struct Plane: public Shape{
 	}
 
 	Material get_material(Vec3 &position) const {
+		if(type == PL_CHECKERBOARD_CHECK){
+			Vec3 d = (this->position - position) / edge;
+			int x = (d.x < 0.0) ? d.x - 1.0:d.x;
+			int z = (d.z < 0.0) ? d.z - 1.0:d.z;
+			bool even_x,even_z;
+			even_x = (x % 2 == 0);
+			even_z = (z % 2 == 0);
+
+			return (even_x == even_z) ? Material(FColor(0.01,0.01,0.01),FColor(0.69,0.69,0.69),FColor(0.30,0.30,0.30),8) : Material(FColor(0.01,0.01,0.01),FColor(0.0,0.0,0.0),FColor(0.30,0.30,0.30),8);
+		}
 		return material;
 	}
 };
