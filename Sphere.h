@@ -22,15 +22,15 @@ struct Sphere : public Shape{
 
 		const R sqrt_d = std::sqrt(D);
 		R t = (-B - sqrt_d) * 0.5 / A;
-		R nd = 1.0;
+		//R nd = 1.0;
 		if(t < 0.0){
 			t += sqrt_d / A;
 			if(t < 0.0)
 				return nullptr;
-			nd *= -1.0;
+			//nd *= -1.0;
 		}
 
-		return new Intersection_point(t,ray.start + t * d,nd * (s + t * d).normalized());
+		return new Intersection_point(t,ray.start + t * d,/*nd * */(s + t * d).normalized());
 	}
 
 	Material get_material(Vec3 &position) const {

@@ -71,6 +71,7 @@ struct Scene{
 		Intersection_point *intersection = intersection_info->intersection_point;
 		Shape *intersection_shape = intersection_info->shape;
 		Material material = intersection_shape->get_material(intersection->position);
+		Vec3 normal = ((ray.direction * intersection->normal < 0.0) ? 1.0 : -1.0) * intersection->normal;
 
 		L += kf * material.ka * Ia;
 
@@ -85,12 +86,12 @@ struct Scene{
 			}
 
 			FColor &Ii = ltg->intensity;
-			R nl = (intersection->normal * ltg->direction);
+			R nl = (normal * ltg->direction);
 
 			if(nl >= 0.0)
 				L += kf * material.kd * Ii * nl;
 
-			const R vr = (-ray.direction) * (2 * nl * intersection->normal - ltg->direction);
+			const R vr = (-ray.direction) * (2 * nl * normal - ltg->direction);
 
 			if(vr >= 0.0)
 				L += kf * material.ks * Ii * std::pow(vr,material.alpha);
@@ -100,8 +101,8 @@ struct Scene{
 		///////////////////////////////
 
 		if(material.type == MT_PERFECT_REF){
-			Vec3 p = intersection->position + epsilon * (-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction);
-			recursive_raytrace(L,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),material.kf,depth + 1);
+			Vec3 p = intersection->position + epsilon * (-2.0 * (normal * ray.direction) * normal + ray.direction);
+			recursive_raytrace(L,Ray(p,-2.0 * (normal * ray.direction) * normal + ray.direction),material.kf,depth + 1);
 		}
 		delete intersection_info;
 	}
@@ -121,6 +122,7 @@ struct Scene{
 				Intersection_point *intersection = intersection_info->intersection_point;
 				Shape *intersection_shape = intersection_info->shape;
 				Material material = intersection_shape->get_material(intersection->position);
+				Vec3 normal = ((ray.direction * intersection->normal < 0.0) ? 1.0 : -1.0) * intersection->normal;
 
 				FColor Ls = material.ka * Ia;
 
@@ -135,12 +137,12 @@ struct Scene{
 					}
 
 					FColor &Ii = ltg->intensity;
-					R nl = (intersection->normal * ltg->direction);
+					R nl = (normal * ltg->direction);
 
 					if(nl >= 0.0)
 						Ls += material.kd * Ii * nl;
 
-					const R vr = (-ray.direction) * (2 * nl * intersection->normal - ltg->direction);
+					const R vr = (-ray.direction) * (2 * nl * normal - ltg->direction);
 
 					if(vr >= 0.0)
 						Ls += material.ks * Ii * std::pow(vr,material.alpha);
@@ -149,8 +151,8 @@ struct Scene{
 				}
 				///////////////////////////////
 				if(material.type == MT_PERFECT_REF){
-					Vec3 p = intersection->position + epsilon * (-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction);
-					recursive_raytrace(Ls,Ray(p,-2.0 * (intersection->normal * ray.direction) * intersection->normal + ray.direction),material.kf,1);
+					Vec3 p = intersection->position + epsilon * (-2.0 * (normal * ray.direction) * normal + ray.direction);
+					recursive_raytrace(Ls,Ray(p,-2.0 * (normal * ray.direction) * normal + ray.direction),material.kf,1);
 				}
 
 
