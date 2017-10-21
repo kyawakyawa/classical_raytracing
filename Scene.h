@@ -19,11 +19,11 @@ struct Scene{
 	Scene() = delete;
 	Scene(FColor ia): Ia(ia),back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)){};
 
-	void add_shape(Shape *shape){
+	void add(Shape *shape){
 		shapes.push_back(shape);
 	}
 
-	void add_light_source(LightSource *light_source){
+	void add(LightSource *light_source){
 		light_sources.push_back(light_source);
 	}
 

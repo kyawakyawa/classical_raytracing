@@ -22,4 +22,5 @@ struct Material{
     Material(Material_type t): ka(FColor(0,0,0)),kd(ka),ks(ka),alpha(1),type(t),n(1.51),kf(FColor(1,1,1)){};
     Material(FColor a,FColor d,FColor s,R al,Material_type t): ka(a),kd(d),ks(s),alpha(al),type(t),n(1.51),kf(FColor(1,1,1)){};
     Material(FColor a,FColor d,FColor s,R al,R _n): ka(a),kd(d),ks(s),alpha(al),type(MT_REFRACTION),n(_n),kf(FColor(1,1,1)){};
+    Material(FColor a,FColor d,FColor s,R al,Material_type t,FColor f): ka(a),kd(d),ks(s),alpha(al),type(t),n(1.51),kf(f){};
 };
