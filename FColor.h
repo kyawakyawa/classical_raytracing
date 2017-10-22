@@ -12,11 +12,11 @@ struct FColor{
     FColor() = default;
     inline constexpr FColor(R r,R g,R b): red(r),green(g),blue(b) {};
 
-    inline void set(R r,R g,R b){
+    inline void set(R r,R g,R b){//セッター
         red = r;green = g;blue = b;
     }
 
-    inline void print255() const{
+    inline void print255() const{//出力
         int r = 255 * red;
         int g = 255 * green;
         int b = 255 * blue;
@@ -27,12 +27,12 @@ struct FColor{
         printf("%d %d %d\n",r,g,b);
     }
 
-    inline FColor fix(){
+    /*inline FColor fix(){
         R r = std::max(0.0,red);r = std::min(1.0,red);
         R g = std::max(0.0,green);g = std::min(1.0,green);
         R b = std::max(0.0,blue);b = std::min(1.0,blue);
         return FColor(r,g,b);
-    }
+    }*/
 
     inline constexpr FColor operator + (const FColor &obj) const{// 2項+ ex a + b
         return FColor(this->red + obj.red,this->green + obj.green,this->blue + obj.blue);
@@ -44,7 +44,7 @@ struct FColor{
         return FColor(this->red * obj.red, this->green * obj.green , this->blue * obj.blue);
     }
 
-    inline constexpr FColor operator * (const R r) const{
+    inline constexpr FColor operator * (const R r) const{//要素同士の掛け算
         return FColor(red * r,green * r,blue * r);
     }
 

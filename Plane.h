@@ -21,6 +21,7 @@ struct Plane: public Shape{
 		const Vec3 &d = ray.direction;
 		Vec3 s2;
 
+		////平面上のもう一つの天を取得
 		if(std::abs(normal.x) > 1e-9)
 			s2 = Vec3(-(normal.y + normal.z) / normal.x,1,1);
 		else if(std::abs(normal.y) > 1e-9)
@@ -30,12 +31,12 @@ struct Plane: public Shape{
 
 		const Vec3 s = ray.start - (s2 + position);
 
-		if(d * normal == 0)
+		if(d * normal == 0)//レイと平面が並行
 			return nullptr;
 
 		const R t = -(s * normal) / (d * normal);
 
-		if(t < 0.0)
+		if(t < 0.0)//平面が視線の後側
 			return nullptr;
 
 		return new Intersection_point(t,ray.start + t * d,normal);

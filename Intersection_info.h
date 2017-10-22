@@ -10,7 +10,7 @@ struct Intersection_info{
     inline constexpr Intersection_info(): shape(nullptr),intersection_point(nullptr){};
     inline constexpr Intersection_info(Shape *s,Intersection_point *i): shape(s),intersection_point(i){};
 
-    inline void rewrite(Shape *s,Intersection_point *i){
+    inline void rewrite(Shape *s,Intersection_point *i){//メンバの更新
         delete intersection_point;
         shape = s;
         intersection_point = i;

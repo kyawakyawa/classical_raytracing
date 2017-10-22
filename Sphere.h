@@ -3,8 +3,8 @@
 #include "Shape.h"
 
 struct Sphere : public Shape{
-	const Vec3 center;
-	const R radius;
+	const Vec3 center;//中心の座標
+	const R radius;//半径
 
 	Sphere() = delete;
 	inline constexpr Sphere(const Vec3 &c,const R &r,const Material &m): Shape(m),center(c),radius(r){};

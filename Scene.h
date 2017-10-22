@@ -6,29 +6,29 @@
 #include "Intersection_info.h"
 
 struct Scene{
-	std::vector<Shape*> shapes;
-	std::vector<LightSource*> light_sources;
-	const FColor Ia;
-	const int HEIGHT = 900;
-	const int WIDTH = 900;
+	std::vector<Shape*> shapes;//物体
+	std::vector<LightSource*> light_sources;//光源
+	const FColor Ia;//環境光の強さ
+	const int HEIGHT = 900;//縦のピクセル
+	const int WIDTH = 900;//横のピクセル
 	const R INF = 1000000000.0;
-	const FColor back;
-	const R epsilon = 1.0 / 512;
-	const int MAX_DEPTH = 5;
-	FColor *img;
+	const FColor back;//物体がないときの色
+	const R epsilon = 1.0 / 512;//微小な値
+	const int MAX_DEPTH = 5;//再帰の深さの最大値
+	FColor *img;//ピクセルごとの色を保持
 
 	Scene() = delete;
 	inline Scene(const FColor &ia): Ia(ia),back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)),img(new FColor[HEIGHT * WIDTH]){};
 
-	inline void add(Shape *shape){
+	inline void add(Shape *shape){//物体を追加する
 		shapes.push_back(shape);
 	}
 
-	inline void add(LightSource *light_source){
+	inline void add(LightSource *light_source){//光源を追加する
 		light_sources.push_back(light_source);
 	}
 
-	inline Intersection_info* get_intersection_of_nearest(const Ray &ray) const{
+	inline Intersection_info* get_intersection_of_nearest(const Ray &ray) const{//一番近い物体の情報を取得する　どちらもnullptrなら物体は存在しない
 		R min_t = INF;
 		Intersection_info *intersection_info = new Intersection_info();
 
@@ -47,7 +47,7 @@ struct Scene{
 
 		return intersection_info;
 	}
-	inline bool is_shadow(const Ray &ray,const R max_t) const {
+	inline bool is_shadow(const Ray &ray,const R max_t) const {//光源までの間に物体がないか調べる
 		for(Shape *shape : shapes){
 			Intersection_point *intersection = shape->get_intersection(ray);
 			if(intersection != nullptr && max_t > intersection->distance){
@@ -59,13 +59,13 @@ struct Scene{
 		return false;
 	}
 
-	inline FColor recursive_raytrace(const Ray &ray,const int depth) const{
+	inline FColor recursive_raytrace(const Ray &ray,const int depth) const{//レイを飛ばす
 		FColor L(0,0,0);
-		if(depth > MAX_DEPTH)
+		if(depth > MAX_DEPTH)//再帰が深すぎ
 			return L;
 		const Intersection_info *intersection_info = get_intersection_of_nearest(ray);
 
-		if(intersection_info == nullptr){
+		if(intersection_info == nullptr){//物体が存在しない
 			L += back;
 			return L;
 		}
@@ -75,40 +75,41 @@ struct Scene{
 		const Material material = intersection_shape->get_material(intersection->position);
 		const Vec3 normal = ((ray.direction * intersection->normal < 0.0) ? 1.0 : -1.0) * intersection->normal;
 
-		L += material.ka * Ia;
+		L += material.ka * Ia;//環境光を計算
 
 		///////////交点の色の計算/////////
-		for(LightSource* light_source : light_sources){
+		for(LightSource* light_source : light_sources){//すべての光源について調べる
 			const Lighting* ltg = light_source->lighting_at(intersection->position);
 
 			const Ray shadow_ray(intersection->position + epsilon * ltg->direction,ltg->direction);
-			if(is_shadow(shadow_ray,ltg->distance - epsilon)){
+			if(is_shadow(shadow_ray,ltg->distance - epsilon)){//影になる場合
 				delete ltg;
 				continue;
 			}
+			//そうでない場合
 
 			const FColor &Ii = ltg->intensity;
 			const R nl = (normal * ltg->direction);
 
-			if(nl >= 0.0)
+			if(nl >= 0.0)//拡散反射光がちゃんとした値なら
 				L += material.kd * Ii * nl;
 
 			const R vr = (-ray.direction) * (2 * nl * normal - ltg->direction);
 
-			if(vr >= 0.0)
+			if(vr >= 0.0)//鏡面反射光がちゃんとした値なら
 				L += material.ks * Ii * std::pow(vr,material.alpha);
 
 			delete ltg;
 		}
 		///////////////////////////////
 
-		if(material.type == MT_PERFECT_REF){
+		if(material.type == MT_PERFECT_REF){//完全鏡面反射の処理
 			const Vec3 r = -2.0 * (normal * ray.direction) * normal + ray.direction;
 			const Vec3 p = intersection->position + epsilon * r;
 			L += material.kf * recursive_raytrace(Ray(p,r),depth + 1);
 		}
 
-		if(material.type == MT_REFRACTION){
+		if(material.type == MT_REFRACTION){//ガラス玉の処理
 			const R n = ((ray.direction * intersection->normal < 0.0) ? 1.0 / material.n : material.n);
 			const R nr = 1.0 / n;
 
@@ -131,7 +132,7 @@ struct Scene{
 		return L;
 	}
 
-	void draw() const{
+	void draw() const{//ppmを吐く
 		printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
 
 		#pragma omp parallel for schedule(dynamic, 1) num_threads(4)

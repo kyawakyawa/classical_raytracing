@@ -2,9 +2,9 @@
 
 #include "LightSource.h"
 
-struct PointLightSource : public LightSource{
-	const Vec3 position;
-	const FColor intensity;
+struct PointLightSource : public LightSource{//点光源
+	const Vec3 position;//光源の位置
+	const FColor intensity;//強さ
 
 	PointLightSource() = delete;
 	inline constexpr PointLightSource(const Vec3 &p,const FColor &i): position(p),intensity(i){};
