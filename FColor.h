@@ -9,7 +9,7 @@ struct FColor{
     R green;
     R blue;
 
-    FColor() = delete;
+    FColor() = default;
     inline constexpr FColor(R r,R g,R b): red(r),green(g),blue(b) {};
 
     inline void set(R r,R g,R b){

@@ -15,9 +15,10 @@ struct Scene{
 	const FColor back;
 	const R epsilon = 1.0 / 512;
 	const int MAX_DEPTH = 5;
+	FColor *img;
 
 	Scene() = delete;
-	inline Scene(const FColor &ia): Ia(ia),back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)){};
+	inline Scene(const FColor &ia): Ia(ia),back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)),img(new FColor[HEIGHT * WIDTH]){};
 
 	inline void add(Shape *shape){
 		shapes.push_back(shape);
@@ -133,13 +134,16 @@ struct Scene{
 	void draw() const{
 		printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
 
-		for(int i = 0;i < HEIGHT;i++){
 		#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
+		for(int i = 0;i < HEIGHT;i++){
 			for(int j = 0;j < WIDTH;j++){
 				const Ray ray(Vec3(0,0,-5),Vec3(2.0 * j / (WIDTH - 1) - 1,-2.0 * i / (HEIGHT - 1) + 1,5));
-				(recursive_raytrace(ray,0)).print255();
+				img[i * WIDTH + j] = recursive_raytrace(ray,0);
 			}
 		}
+
+		for(int i = 0;i < HEIGHT * WIDTH;i++)
+			img[i].print255();
 
 	}
 
@@ -148,5 +152,6 @@ struct Scene{
 			delete shape;
 		for(LightSource *light_source : light_sources)
 			delete light_source;
+		delete[] img;
 	}
 };
