@@ -10,13 +10,13 @@ struct FColor{
     R blue;
 
     FColor() = delete;
-    constexpr FColor(R r,R g,R b): red(r),green(g),blue(b) {};
+    inline constexpr FColor(R r,R g,R b): red(r),green(g),blue(b) {};
 
-    void set(R r,R g,R b){
+    inline void set(R r,R g,R b){
         red = r;green = g;blue = b;
     }
 
-    void print255() const{
+    inline void print255() const{
         int r = 255 * red;
         int g = 255 * green;
         int b = 255 * blue;
@@ -27,46 +27,46 @@ struct FColor{
         printf("%d %d %d\n",r,g,b);
     }
 
-    FColor fix(){
+    inline FColor fix(){
         R r = std::max(0.0,red);r = std::min(1.0,red);
         R g = std::max(0.0,green);g = std::min(1.0,green);
         R b = std::max(0.0,blue);b = std::min(1.0,blue);
         return FColor(r,g,b);
     }
 
-    constexpr FColor operator + (const FColor &obj) const{// 2項+ ex a + b
+    inline constexpr FColor operator + (const FColor &obj) const{// 2項+ ex a + b
         return FColor(this->red + obj.red,this->green + obj.green,this->blue + obj.blue);
     }
-    constexpr FColor operator - (const FColor &obj) const{// 2項- ex a - b
+    inline constexpr FColor operator - (const FColor &obj) const{// 2項- ex a - b
         return FColor(this->red- obj.red,this->green - obj.green,this->blue - obj.blue);
     }
-    constexpr FColor operator * (const FColor &obj) const{// 要素同士の掛け算
+    inline constexpr FColor operator * (const FColor &obj) const{// 要素同士の掛け算
         return FColor(this->red * obj.red, this->green * obj.green , this->blue * obj.blue);
     }
 
-    constexpr FColor operator * (const R r) const{
+    inline constexpr FColor operator * (const R r) const{
         return FColor(red * r,green * r,blue * r);
     }
 
-    FColor& operator +=(const FColor& obj){
+    inline FColor& operator +=(const FColor& obj){
         red += obj.red;
         green += obj.green;
         blue += obj.blue;
         return *this;
     }
-    FColor& operator -=(const FColor& obj){
+    inline FColor& operator -=(const FColor& obj){
         red -= obj.red;
         green += obj.green;
         blue += obj.blue;
         return *this;
     }
-    FColor& operator *=(const FColor& obj){
+    inline FColor& operator *=(const FColor& obj){
         red *= obj.red;
         green *= obj.green;
         blue *= obj.blue;
         return *this;
     }
-    FColor& operator *=(const R r){
+    inline FColor& operator *=(const R r){
         red *= r;
         green *= r;
         blue *= r;
@@ -74,6 +74,6 @@ struct FColor{
     }
 };
 
-inline FColor operator *(const R s,const FColor& v){//スカラー*ベクトル
+inline constexpr FColor operator *(const R s,const FColor& v){//スカラー*ベクトル
 	return {s * v.red,s * v.green,s * v.blue};
 }

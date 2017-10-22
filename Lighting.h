@@ -4,9 +4,9 @@
 #include "FColor.h"
 
 struct Lighting{
-	R distance;
-	FColor intensity;
-	Vec3 direction;
+	const R distance;
+	const FColor intensity;
+	const Vec3 direction;
 	Lighting() = delete;
-	Lighting(R d,FColor i,Vec3 _d) : distance(d),intensity(i),direction(_d.normalized()){};
+	inline constexpr Lighting(const R d,const FColor &i,const Vec3 &_d) : distance(d),intensity(i),direction(_d.normalized()){};
 };

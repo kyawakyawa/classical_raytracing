@@ -3,15 +3,13 @@
 #include "LightSource.h"
 
 struct PointLightSource : public LightSource{
-	Vec3 position;
-	FColor intensity;
+	const Vec3 position;
+	const FColor intensity;
 
 	PointLightSource() = delete;
-	PointLightSource(Vec3 p,FColor i): position(p),intensity(i){};
+	inline constexpr PointLightSource(const Vec3 &p,const FColor &i): position(p),intensity(i){};
 
-	Lighting* lighting_at(Vec3& pos) const{
-		/*R distance = (position - pos).abs();
-		Vec3 direction = (position - pos).normalized();*/
+	inline Lighting* lighting_at(const Vec3& pos) const{
 		return new Lighting((position - pos).abs(),intensity,Vec3(position - pos));
 	}
 };

@@ -4,9 +4,9 @@
 #include "Lighting.h"
 
 struct LightSource{
-	constexpr LightSource() = default;
+	inline constexpr LightSource() = default;
 
-	virtual Lighting* lighting_at(Vec3& pos) const = 0;
+	inline virtual Lighting* lighting_at(const Vec3& pos) const = 0;
 
 	virtual ~LightSource() = default;
 };

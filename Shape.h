@@ -6,14 +6,14 @@
 #include "Intersection_point.h"
 
 struct Shape{
-	Material material;
+	const Material material;
 
-	Shape() = delete;
-	Shape(Material m): material(m){};
+	inline Shape() = delete;
+	inline constexpr Shape(const Material &m): material(m){};
 
-	virtual Intersection_point* get_intersection(const Ray &ray) const = 0;
+	inline virtual Intersection_point* get_intersection(const Ray &ray) const = 0;
 
-	virtual Material get_material(Vec3 &position) const = 0;
+	inline virtual Material get_material(const Vec3 &position) const = 0;
 
-	virtual ~Shape() = default;
+	inline virtual ~Shape() = default;
 };

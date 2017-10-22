@@ -11,67 +11,67 @@ struct Vec3{
 		R y;
 		R z;
 
-		Vec3() = default;//: x(0.0),y(0.0),z(0.0){};
-		constexpr Vec3(const R _x,const R _y,const R _z): x(_x),y(_y),z(_z){};
+		inline Vec3() = default;//: x(0.0),y(0.0),z(0.0){};
+		inline constexpr Vec3(const R _x,const R _y,const R _z): x(_x),y(_y),z(_z){};
 
-		constexpr Vec3 operator +() const{//　単項+   ex +a
+		inline constexpr Vec3 operator +() const{//　単項+   ex +a
 			return *this;
 		}
-		constexpr Vec3 operator -() const{//  単項-   ex -a
+		inline constexpr Vec3 operator -() const{//  単項-   ex -a
 			return{ -x,-y,-z};
 		}
 
-		constexpr Vec3 operator + (const Vec3 &obj) const{// 2項+ ex a + b
+		inline constexpr Vec3 operator + (const Vec3 &obj) const{// 2項+ ex a + b
 			return Vec3(this->x + obj.x,this->y + obj.y,this->z + obj.z);
 		}
-		constexpr Vec3 operator - (const Vec3 &obj) const{// 2項- ex a - b
+		inline constexpr Vec3 operator - (const Vec3 &obj) const{// 2項- ex a - b
 			return Vec3(this->x - obj.x,this->y - obj.y,this->z - obj.z);
 		}
 
-		constexpr R operator * (const Vec3 &obj) const{// 内積 
+		inline constexpr R operator * (const Vec3 &obj) const{// 内積 
 			return this->x * obj.x + this->y * obj.y + this->z * obj.z;
 		}
 
 
-		constexpr Vec3 operator * (const R a) const{//スカラー積（後ろがスカラー)
+		inline constexpr Vec3 operator * (const R a) const{//スカラー積（後ろがスカラー)
 			return Vec3(this->x * a,this->y * a,this->z * a);
 		}
-		constexpr Vec3 operator / (const R a) const{//スカラー除
+		inline constexpr Vec3 operator / (const R a) const{//スカラー除
 			return Vec3(this->x / a,this->y / a,this->z / a);
 		}
 
-		Vec3& operator +=(const Vec3& obj){
+		inline Vec3& operator +=(const Vec3& obj){
 			x += obj.x;
 			y += obj.y;
 			z += obj.z;
 			return *this;
 		}
-		Vec3& operator -=(const Vec3& obj){
+		inline Vec3& operator -=(const Vec3& obj){
 			x -= obj.x;
 			y += obj.y;
 			z += obj.z;
 			return *this;
 		}
-		Vec3& operator *=(const R a){
+		inline Vec3& operator *=(const R a){
 			x *= a;
 			y *= a;
 			z *= a;
 			return *this;
 		}
-		Vec3& operator /=(const R a){
+		inline Vec3& operator /=(const R a){
 			x /= a;
 			y /= a;
 			z /= a;
 			return *this;
 		}
 
-	 	R abs() const{
+	 	inline R abs() const{//gccならconstexprにしても良い
 			return std::sqrt(x * x + y * y + z * z);
 		}
-		constexpr R abs_square() const{
+		inline constexpr R abs_square() const{
 			return x * x + y * y + z * z;
 		}
-		Vec3 normalized() const {//正規化（ベクトルの長さを1にする)ベクトル
+		inline Vec3 normalized() const {//正規化（ベクトルの長さを1にする)ベクトル
 			R l = abs();
 			return { x / l,y / l , z / l};
 		}
