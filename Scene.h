@@ -134,6 +134,7 @@ struct Scene{
 		printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
 
 		for(int i = 0;i < HEIGHT;i++){
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
 			for(int j = 0;j < WIDTH;j++){
 				const Ray ray(Vec3(0,0,-5),Vec3(2.0 * j / (WIDTH - 1) - 1,-2.0 * i / (HEIGHT - 1) + 1,5));
 				(recursive_raytrace(ray,0)).print255();
