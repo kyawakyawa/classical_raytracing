@@ -42,8 +42,10 @@ struct Scene{
 				delete intersection;
 		}
 
-		if(intersection_info->shape == nullptr)
+		if(intersection_info->shape == nullptr){
+			delete intersection_info;
 			return nullptr;
+		}
 
 		return intersection_info;
 	}
